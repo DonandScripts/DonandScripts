@@ -204,7 +204,7 @@ function FastAttack()
     end
     FastAttackSettings = {
         ["CDAAT"] = 5,
-        ["TimeWait"] = 0.5
+        ["TimeWait"] = 0.1
     }
     spawn(function()
         local CameraShakerR = require(game.ReplicatedStorage.Util.CameraShaker)
