@@ -19,11 +19,9 @@ old = hookfunction(ParticleToolsModule.Make,function(...)
                 if partne then 
                     if not CrossHairList[partne] then 
                         CrossHairList[partne] = {}
-                    else
-                        table.insert(CrossHairList[partne],Cross)
                     end
+                    table.insert(CrossHairList[partne],Cross)
                 end
-                
             end
             return old(...)
         end
