@@ -1,0 +1,33 @@
+local LocalFlyingEntityModule = require(game.ReplicatedStorage.LocalFlyingEntity)
+local CrossHairList = {}
+local Cross
+local plr = game.Players.LocalPlayer
+local ParticleToolsModule = require(game.ReplicatedStorage.LocalFX.LocalTargetPracticeBeam)
+game.Workspace.Particles.ChildAdded:Connect(function(v)
+    if v.Name == "Crosshair" and v ~= nil and v.BrickColor ~= BrickColor.new("Forest green") and v.BrickColor ~= BrickColor.new("Flint") then
+        Cross = v
+    end
+end)
+local old
+old = hookfunction(ParticleToolsModule.Make,function(...) 
+    local cailonmem = ...
+    if tostring(cailonmem.Player)==plr.Name then 
+        if cailonmem.Action == "Make" then 
+            Cross = nil
+            if Cross and cailonmem and cailonmem.FEID then 
+                local partne = LocalFlyingEntityModule.GetEntity(cailonmem.FEID).Part
+                if partne then 
+                    if not CrossHairList[partne] then 
+                        CrossHairList[partne] = {}
+                    else
+                        table.insert(CrossHairList[partne],Cross)
+                    end
+                end
+                
+            end
+            return old(...)
+        end
+    end
+    return old(...)
+end)
+return CrossHairList
