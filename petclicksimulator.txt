@@ -4354,27 +4354,26 @@ getgenv().GotoField= true
 
 function ConCacBaMay()
     while true do
-        for i = 1, 10 do
-            local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
-            local FieldPosIn = FieldFarmPos[TempField]
-            local sucvatruabithieunang = false
-            local token 
-            local piro
-            if not token then 
-                token,piro = GetNerestToken(TempField,nil,ListAllToken,FieldPosIn,Whitelist)
+        local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
+        local FieldPosIn = FieldFarmPos[TempField]
+        local sucvatruabithieunang = false
+        local token 
+        local piro
+        if not token then 
+            token,piro = GetNerestToken(TempField,nil,ListAllToken,FieldPosIn,Whitelist)
+        end
+        if token and token.Parent == game:GetService("Workspace").Camera.DupedTokens then 
+            sucvatruabithieunang = true
+        end
+        if Settings['Prioritize Token Collection only'] then 
+            if piro then 
+                getgenv().DisableSetSpeed = false
+            else
+                getgenv().DisableSetSpeed = true
             end
-            if token and token.Parent == game:GetService("Workspace").Camera.DupedTokens then 
-                sucvatruabithieunang = true
-            end
-            if Settings['Prioritize Token Collection only'] then 
-                if piro then 
-                    getgenv().DisableSetSpeed = false
-                else
-                    getgenv().DisableSetSpeed = true
-                end
-            end
-            --print(token,FieldPosIn)
-            
+        end
+        --print(token,FieldPosIn)
+        for i = 1,5 do 
             if token then
                 print('?')
                 if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
@@ -4424,7 +4423,7 @@ function ConCacBaMay()
                     end
                     task.wait()
                 end
-            end
+            end 
         end
     end
 end
