@@ -4373,7 +4373,7 @@ function ConCacBaMay()
             end
         end
         --print(token,FieldPosIn)
-        for i = 1,5 do 
+        for i = 1,8 do 
             if token then
                 print('?')
                 if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
