@@ -4351,94 +4351,85 @@ getgenv().GotoField= true
 --         AutoFarm()
 --     end
 -- end)
-local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
-local FieldPosIn = FieldFarmPos[TempField]
-local sucvatruabithieunang = false
-local token 
-local piro
+
 function ConCacBaMay()
-    --while true do
-        local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
-        local FieldPosIn = FieldFarmPos[TempField]
-        -- local sucvatruabithieunang = false
-        -- local token 
-        -- local piro
-        -- if not token then 
-        --     token,piro = GetNerestToken(TempField,nil,ListAllToken,FieldPosIn,Whitelist)
-        -- end
-        if token and token.Parent == game:GetService("Workspace").Camera.DupedTokens then 
-            sucvatruabithieunang = true
-        end
-        if Settings['Prioritize Token Collection only'] then 
-            if piro then 
-                getgenv().DisableSetSpeed = false
-            else
-                getgenv().DisableSetSpeed = true
-            end
-        end
-        --print(token,FieldPosIn)
-        
-        if token then
-            if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
-                print('token')
-                Walkk(CFrame.new(token.Position.X, plr.Character:WaitForChild("HumanoidRootPart").Position.Y, token.Position.Z),token)
-                local Black = Instance.new("Part")
-                Black.Parent = token
-                Black.Name = "Blacklisted"
-                Black.Anchored=true
-                Black.CanCollide=false
-                Black.Transparency=1
-                Black.CFrame=CFrame.new(1000000,100000,100000)
-                game.Debris:AddItem(Black,2)
-                if Settings['Prioritize Token Collection only'] then 
-                    getgenv().DisableSetSpeed = true
-                else
-                    getgenv().DisableSetSpeed = false
-                end
-                if sucvatruabithieunang then 
-                    wait(1)
-                end
-                token = nil
-            else
-                task.wait()
-                f = nil
-                token = nil
-            end
-        else
-        --     print('??')
-            if plr.Character:FindFirstChild("HumanoidRootPart") then 
-                --print('cc')
-                local ray = Ray.new(plr.Character.HumanoidRootPart.Position,Vector3.new(0,-20,0))
-                local part = getIntersection(game.Workspace.Flowers,ray)
-                
-                if part then 
-                    local curr,x,y = GetXY(part)
-                    if curr and x and y then 
-                        local xnew = math.random(x-5,x+5)
-                        local ynew = math.random(y-5,y+5)
-                        local newflower = GetFlower(curr,xnew,ynew)
-                        if newflower then 
-                            if getgenv().IsValidTokenPos(newflower.Position+Vector3.new(0,2,0),TempField) then
-                                print('walk')
-                                Walkk(newflower.CFrame)
-                            end
-                        end
-                    
-                    end
-                end
-                task.wait()
-            end
-            token = nil
-            piro = nil
-            sucvatruabithieunang = false
+    while true do
+        for i = 1, 10 do
+            local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
+            local FieldPosIn = FieldFarmPos[TempField]
+            local sucvatruabithieunang = false
+            local token 
+            local piro
             if not token then 
                 token,piro = GetNerestToken(TempField,nil,ListAllToken,FieldPosIn,Whitelist)
             end
+            if token and token.Parent == game:GetService("Workspace").Camera.DupedTokens then 
+                sucvatruabithieunang = true
+            end
+            if Settings['Prioritize Token Collection only'] then 
+                if piro then 
+                    getgenv().DisableSetSpeed = false
+                else
+                    getgenv().DisableSetSpeed = true
+                end
+            end
+            --print(token,FieldPosIn)
+            
+            if token then
+                print('?')
+                if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
+                    print('token')
+                    Walkk(CFrame.new(token.Position.X, plr.Character:WaitForChild("HumanoidRootPart").Position.Y, token.Position.Z),token)
+                    local Black = Instance.new("Part")
+                    Black.Parent = token
+                    Black.Name = "Blacklisted"
+                    Black.Anchored=true
+                    Black.CanCollide=false
+                    Black.Transparency=1
+                    Black.CFrame=CFrame.new(1000000,100000,100000)
+                    game.Debris:AddItem(Black,2)
+                    if Settings['Prioritize Token Collection only'] then 
+                        getgenv().DisableSetSpeed = true
+                    else
+                        getgenv().DisableSetSpeed = false
+                    end
+                    if sucvatruabithieunang then 
+                        wait(1)
+                    end
+                else
+                    task.wait()
+                    f = nil
+                end
+            else
+            --     print('??')
+                if plr.Character:FindFirstChild("HumanoidRootPart") then 
+                    --print('cc')
+                    local ray = Ray.new(plr.Character.HumanoidRootPart.Position,Vector3.new(0,-20,0))
+                    local part = getIntersection(game.Workspace.Flowers,ray)
+                    
+                    if part then 
+                        local curr,x,y = GetXY(part)
+                        if curr and x and y then 
+                            local xnew = math.random(x-5,x+5)
+                            local ynew = math.random(y-5,y+5)
+                            local newflower = GetFlower(curr,xnew,ynew)
+                            if newflower then 
+                                if getgenv().IsValidTokenPos(newflower.Position+Vector3.new(0,2,0),TempField) then
+                                    print('walk')
+                                    Walkk(newflower.CFrame)
+                                end
+                            end
+                        
+                        end
+                    end
+                    task.wait()
+                end
+            end
         end
-    --end
+    end
 end
 
-RunService.Heartbeat:Connect(function()ConCacBaMay()end)
+spawn(function()ConCacBaMay()end)
 
 -- spawn(function()
 --     while true do wait()
