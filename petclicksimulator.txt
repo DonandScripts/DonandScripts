@@ -4352,7 +4352,7 @@ getgenv().GotoField= true
 --     end
 -- end)
 
-spawn(function()
+function ConCacBaMay()
     while true do
         local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
         local FieldPosIn = FieldFarmPos[TempField]
@@ -4374,32 +4374,32 @@ spawn(function()
         end
         --print(token,FieldPosIn)
         
-        -- if token then
-        --     print('?')
-        --     if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
-        --         print('token')
-        --         Walkk(CFrame.new(token.Position.X, plr.Character:WaitForChild("HumanoidRootPart").Position.Y, token.Position.Z),token)
-        --         local Black = Instance.new("Part")
-        --         Black.Parent = token
-        --         Black.Name = "Blacklisted"
-        --         Black.Anchored=true
-        --         Black.CanCollide=false
-        --         Black.Transparency=1
-        --         Black.CFrame=CFrame.new(1000000,100000,100000)
-        --         game.Debris:AddItem(Black,2)
-        --         if Settings['Prioritize Token Collection only'] then 
-        --             getgenv().DisableSetSpeed = true
-        --         else
-        --             getgenv().DisableSetSpeed = false
-        --         end
-        --         if sucvatruabithieunang then 
-        --             wait(1)
-        --         end
-        --     else
-        --         task.wait()
-        --         f = nil
-        --     end
-        -- else
+        if token then
+            print('?')
+            if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
+                print('token')
+                Walkk(CFrame.new(token.Position.X, plr.Character:WaitForChild("HumanoidRootPart").Position.Y, token.Position.Z),token)
+                local Black = Instance.new("Part")
+                Black.Parent = token
+                Black.Name = "Blacklisted"
+                Black.Anchored=true
+                Black.CanCollide=false
+                Black.Transparency=1
+                Black.CFrame=CFrame.new(1000000,100000,100000)
+                game.Debris:AddItem(Black,2)
+                if Settings['Prioritize Token Collection only'] then 
+                    getgenv().DisableSetSpeed = true
+                else
+                    getgenv().DisableSetSpeed = false
+                end
+                if sucvatruabithieunang then 
+                    wait(1)
+                end
+            else
+                task.wait()
+                f = nil
+            end
+        else
         --     print('??')
             if plr.Character:FindFirstChild("HumanoidRootPart") then 
                 print('cc')
@@ -4423,9 +4423,9 @@ spawn(function()
                 end
                 task.wait()
             end
-        -- end
+        end
     end
-end)
+end
 
 -- spawn(function()
 --     while true do wait()
