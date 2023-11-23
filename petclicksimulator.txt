@@ -4353,7 +4353,7 @@ getgenv().GotoField= true
 -- end)
 
 function ConCacBaMay()
-    while true do
+    --while true do
         local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
         local FieldPosIn = FieldFarmPos[TempField]
         local sucvatruabithieunang = false
@@ -4379,6 +4379,7 @@ function ConCacBaMay()
             if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
                 print('token')
                 Walkk(CFrame.new(token.Position.X, plr.Character:WaitForChild("HumanoidRootPart").Position.Y, token.Position.Z),token)
+                coroutine.wrap(function()
                 local Black = Instance.new("Part")
                 Black.Parent = token
                 Black.Name = "Blacklisted"
@@ -4387,6 +4388,7 @@ function ConCacBaMay()
                 Black.Transparency=1
                 Black.CFrame=CFrame.new(1000000,100000,100000)
                 game.Debris:AddItem(Black,2)
+                end)
                 if Settings['Prioritize Token Collection only'] then 
                     getgenv().DisableSetSpeed = true
                 else
@@ -4424,10 +4426,10 @@ function ConCacBaMay()
                 task.wait()
             end
         end
-    end
+    --end
 end
 
-spawn(function()ConCacBaMay()end)
+RunService.Heartbeat:Connect(function()ConCacBaMay()end)
 
 -- spawn(function()
 --     while true do wait()
