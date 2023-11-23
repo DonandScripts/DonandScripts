@@ -4427,6 +4427,8 @@ function ConCacBaMay()
     end
 end
 
+spawn(function()ConCacBaMay()end)
+
 -- spawn(function()
 --     while true do wait()
 --         if Settings['Auto Farm'] and ValidFarm() then
