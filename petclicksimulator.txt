@@ -4351,17 +4351,21 @@ getgenv().GotoField= true
 --         AutoFarm()
 --     end
 -- end)
-
+local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
+local FieldPosIn = FieldFarmPos[TempField]
+local sucvatruabithieunang = false
+local token 
+local piro
 function ConCacBaMay()
     --while true do
         local TempField= FarmFieldList[LevelFarm[#LevelFarm]]
         local FieldPosIn = FieldFarmPos[TempField]
-        local sucvatruabithieunang = false
-        local token 
-        local piro
-        if not token then 
-            token,piro = GetNerestToken(TempField,nil,ListAllToken,FieldPosIn,Whitelist)
-        end
+        -- local sucvatruabithieunang = false
+        -- local token 
+        -- local piro
+        -- if not token then 
+        --     token,piro = GetNerestToken(TempField,nil,ListAllToken,FieldPosIn,Whitelist)
+        -- end
         if token and token.Parent == game:GetService("Workspace").Camera.DupedTokens then 
             sucvatruabithieunang = true
         end
@@ -4375,11 +4379,9 @@ function ConCacBaMay()
         --print(token,FieldPosIn)
         
         if token then
-            print('?')
             if getgenv().IsValidTokenPos(token, TempField,FieldPosIn) and getgenv().IsToken(token) and not getgenv().IsTokenBlacklist(token) and Settings['Auto Farm'] and ValidFarm() then
                 print('token')
                 Walkk(CFrame.new(token.Position.X, plr.Character:WaitForChild("HumanoidRootPart").Position.Y, token.Position.Z),token)
-                coroutine.wrap(function()
                 local Black = Instance.new("Part")
                 Black.Parent = token
                 Black.Name = "Blacklisted"
@@ -4388,7 +4390,6 @@ function ConCacBaMay()
                 Black.Transparency=1
                 Black.CFrame=CFrame.new(1000000,100000,100000)
                 game.Debris:AddItem(Black,2)
-                end)
                 if Settings['Prioritize Token Collection only'] then 
                     getgenv().DisableSetSpeed = true
                 else
@@ -4397,14 +4398,16 @@ function ConCacBaMay()
                 if sucvatruabithieunang then 
                     wait(1)
                 end
+                token = nil
             else
                 task.wait()
                 f = nil
+                token = nil
             end
         else
         --     print('??')
             if plr.Character:FindFirstChild("HumanoidRootPart") then 
-                print('cc')
+                --print('cc')
                 local ray = Ray.new(plr.Character.HumanoidRootPart.Position,Vector3.new(0,-20,0))
                 local part = getIntersection(game.Workspace.Flowers,ray)
                 
@@ -4424,6 +4427,12 @@ function ConCacBaMay()
                     end
                 end
                 task.wait()
+            end
+            token = nil
+            piro = nil
+            sucvatruabithieunang = false
+            if not token then 
+                token,piro = GetNerestToken(TempField,nil,ListAllToken,FieldPosIn,Whitelist)
             end
         end
     --end
