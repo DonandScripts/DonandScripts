@@ -98,4 +98,4 @@ function to(vg1)
 
     mm:Play()
 end
-to(CFrame.new(21313123123,21312313123213,12312313123213))
+to(CFrame.new(0,999,0))
