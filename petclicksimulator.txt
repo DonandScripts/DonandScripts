@@ -80,7 +80,7 @@ function to(vg1)
 
     vg5 = game.Players.LocalPlayer.Character.HumanoidRootPart
     vg4 = vg5.CFrame
-
+    vg7 = q1(vg4, vg2)
     if vg7 > q1(vg3, vg2) and vg7 > 300 then
         return g1(vg3)
     end
