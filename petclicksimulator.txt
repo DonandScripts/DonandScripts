@@ -1957,6 +1957,7 @@ function MainFarm()
                 return
             end
             if #getgenv().Chests == 0 then
+                print('v')
                 if not GetChestCheck then
                     delay(10, function()
                         getgenv().GetChestCheck = false
@@ -2003,8 +2004,11 @@ function MainFarm()
                         return
                     end
                 else
+                    print('c')
                     local Chest = GetNearestChest()
+                    print('b')
                     if Chest then
+                        print('a')
                         if Settings['Hop Server after collected 10 Chest'] and plr:DistanceFromCharacter(Chest.Position) > 2000 then
                             HopServer()
                             wait(5)
