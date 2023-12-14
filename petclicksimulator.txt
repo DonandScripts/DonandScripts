@@ -1440,18 +1440,18 @@ function MainFarm()
             end
         end
         if SelectedFMob then
-            if SelectedFMob ~= "Bandit"
-            and SelectedFMob ~= "Trainee"
-            and plrLevel < 120
-            and Settings['Auto Farm'] then
-                if not NotiForRetard then
-                    --Library.CreateNoti({Desc = "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing", ShowTime = 60})
-                    getgenv().NotiForRetard = true
-                end
-                --AutoFarmLabel.SetText(LabelTextAF ..  "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing")
-                FarmLocation({"Royal Soldier", "Royal Squad"}, CFrame.new(-7806.525390625, 5635.63818359375, -1526.8787841796875))
-                return
-            end
+            -- if SelectedFMob ~= "Bandit"
+            -- and SelectedFMob ~= "Trainee"
+            -- and plrLevel < 120
+            -- and Settings['Auto Farm'] then
+            --     if not NotiForRetard then
+            --         --Library.CreateNoti({Desc = "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing", ShowTime = 60})
+            --         getgenv().NotiForRetard = true
+            --     end
+            --     --AutoFarmLabel.SetText(LabelTextAF ..  "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing")
+            --     FarmLocation({"Royal Soldier", "Royal Squad"}, CFrame.new(-7806.525390625, 5635.63818359375, -1526.8787841796875))
+            --     return
+            -- end
             if not HaveQuest(MobTable, SelectedFMob, FMob) then
                 if not TargetBoss
                 and SelectedFMob ~= "Factory Staff" then
