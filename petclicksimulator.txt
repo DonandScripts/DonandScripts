@@ -1218,7 +1218,23 @@ MainTab:AddToggle({
 MainTab:AddSection({
 	Name = "Auto Chest"
 })
-
+function GetNearestChest()
+    local Dist = math.huge
+    local Chest
+    local Counter
+    for i, v in ipairs(Chests) do
+        local Mag = plr:DistanceFromCharacter(v.Position)
+        if Mag < Dist then
+            Counter = i
+            Dist = Mag
+            Chest = v
+        end
+    end
+    if Counter then
+        table.remove(getgenv().Chests, Counter)
+        return Chest
+    end
+end
 loadstring([[
     getgenv().GetChests = function()
         for i, v in ipairs(game.workspace:GetChildren()) do
