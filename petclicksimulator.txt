@@ -538,7 +538,7 @@ local SeaBeastRandomPos = {
 }
 function FindOwnBoat()
     for i, v in ipairs(game.workspace.Boats:GetChildren()) do
-        if v.Owner.Value == plr
+        if v:FindFirstChild('Owner') and v.Owner.Value == plr
         and v.Humanoid.Value ~= 0 then
             return v
         end
