@@ -1263,7 +1263,7 @@ MainTab:AddToggle({
             end)
         end
         getgenv().CollectedChest = 0
-        Settings['Auto Chest'] = v
+        Settings['Auto Chest'] = Value
 	end    
 })
 
