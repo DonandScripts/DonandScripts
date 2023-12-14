@@ -209,16 +209,11 @@ if game.PlaceId == 4442272183 then
     end
 end
 local Library = {}
-function Library.CreateNoti(Text,time)
-    if typeof(Text) =='table' then
-        for i,v in pairs(Text) do
-            Text = v
-        end
-    end
+function Library.CreateNoti(Text)
     Window:MakeNotification({
         Title = "Script Notifications!",
-        Description = tostring(Text),
-        Duration = time
+        Description = Text.Desc,
+        Duration = Text.ShowTime
     })
 end
 local EnemySpawns = {}
@@ -2007,6 +2002,7 @@ function MainFarm()
                 or not Settings['Auto Farm Ken Haki']
                 if Settings['Auto Farm Ken Haki'] and game.Lighting.ExposureCompensation == 0 then
                     HopServer()
+                    return
                 end
             else
                 local UnloadMob = GetUnloadedMob()
