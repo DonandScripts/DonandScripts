@@ -920,8 +920,8 @@ if not BringMobRun then
         if Settings['Bring Mob'] and BringTo then
             getgenv().SetSimulationRadius = true
             for i, v in ipairs(game.workspace.Enemies:GetChildren()) do
-                if v:FindFirstChild("AdelBring")
-                and IsMobAlive(v) then --                and isnetworkowner(v.HumanoidRootPart)
+                if v.Head:FindFirstChild("AdelBring")
+                and IsMobAlive(v) and isnetworkowner(v.HumanoidRootPart) then
                     BringTo.Humanoid:ChangeState(11)
                     v.HumanoidRootPart.CFrame = BringTo.HumanoidRootPart.CFrame
                     v.Humanoid:ChangeState(11)
