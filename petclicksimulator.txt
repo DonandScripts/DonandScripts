@@ -211,11 +211,13 @@ end
 local Library = {}
 function Library.CreateNoti(Text,time)
     if typeof(Text) =='table' then
-        Text = tostring(Text)
+        for i,v in pairs(Text) do
+            Text = v
+        end
     end
     Window:MakeNotification({
         Title = "Script Notifications!",
-        Description = Text,
+        Description = tostring(Text),
         Duration = time
     })
 end
@@ -487,7 +489,7 @@ function GetNearestPlayerToMFArea(x)
 end
 function HopIfNearFarmArea(Pos, mag, forced)
     if not mag then mag = 1000 end
-    if (Settings.MFHopServer or forced)
+    if (Settings['Hop if near player.'] or forced)
     and GetNearestPlayerToMFArea(Pos) < mag then
         Library.CreateNoti({Desc = "There are players near the auto farm area.", ShowTime = 5})
         HopServer(false, true)
@@ -1126,6 +1128,25 @@ end
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/DonandScripts/IjK4rSEaL88KQAF2azTaH3tSTVPGYjbfXgW62mdFNeFMXhtUmq9I8CKPMux5IjK4rSEaL88KQAF2azTaH3tSTVPGYjbfXgW62mdF/main/aaaa")))()
 getgenv().Window = OrionLib:MakeWindow({Name = "Adel Hub - BF",IntroEnabled =true,IntroText ='Adel Hub Library',IntroIcon = 'rbxassetid://13779309461' , HidePremium = false, SaveConfig = false, ConfigFolder = "OrionTest"})
 
+local MainTab = Window:MakeTab({
+	Name = "Main",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false,
+    Default = true
+})
+MainTab:AddSection({
+	Name = "Main Features"
+})
+
+MainTab:AddToggle({
+	Name = "Hop if near players.",
+	Default = Settings['Hop if near player.'],
+    Info = 'Only work with farm features.',
+	Callback = function(Value)
+		Settings['Hop if near player.'] = Value
+	end    
+})
+
 local FarmTab = Window:MakeTab({
 	Name = "Farm",
 	Icon = "rbxassetid://4483345998",
@@ -1492,11 +1513,10 @@ function MainFarm()
             and plrLevel < 120
             and Settings['Auto Farm'] then
                 if not NotiForRetard then
-                    Library.CreateNoti({Desc = "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing", ShowTime = 60})
+                    Library.CreateNoti({Desc = "This is the best way to farm from Lvl 10 to 120.", ShowTime = 60})
                     getgenv().NotiForRetard = true
                 end
-                --AutoFarmLabel.SetText(LabelTextAF ..  "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing")
-                FarmLocation({"Royal Soldier", "Royal Squad"}, CFrame.new(-7806.525390625, 5635.63818359375, -1526.8787841796875))
+                FarmLocation({"Shanda", "Royal Squad"}, CFrame.new(-7806.525390625, 5635.63818359375, -1526.8787841796875))
                 return
             end
             if not HaveQuest(MobTable, SelectedFMob, FMob) then
