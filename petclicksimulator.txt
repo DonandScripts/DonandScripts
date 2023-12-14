@@ -1270,7 +1270,6 @@ MainTab:AddToggle({
 MainTab:AddToggle({
 	Name = "Hop If No Chest",
 	Default = Settings['Hop if no chests.'],
-    Info = 'Only work with farm features.',
 	Callback = function(Value)
 		Settings['Hop if no chests.'] = Value
 	end    
@@ -1417,11 +1416,37 @@ if game.PlaceId ~= 7449423635 then
 elseif Settings['Auto Next Sea'] then
     Settings['Auto Next Sea'] = false
 end
-
+function GetMobAura(x)
+    local Mobs = {}
+    for i, v in ipairs(game.workspace.Enemies:GetChildren()) do
+        if not string.find(v.Name, "Boss")
+        and IsMobAlive(v)
+        and (x or plr:DistanceFromCharacter(v.HumanoidRootPart.Position) < 2000) then
+            table.insert(Mobs, GetMobNameOnly(v.Name))
+        end
+    end
+    local Mob = GetMob(Mobs)
+    return Mob
+end
 FarmTab:AddSection({
 	Name = "Auto Sword"
 })
-
+function GetUnloadedMob()
+    local ReqName = "Lv."
+    local Dist = math.huge
+    local Mob
+    for i, v in ipairs(game.ReplicatedStorage:GetChildren()) do
+        if string.find(v.Name, ReqName)
+        and IsMobAlive(v) then
+            local Mag = plr:DistanceFromCharacter(v.HumanoidRootPart.Position)
+            if Mag < Dist then
+                Dist = Mag
+                Mob = v
+            end
+        end
+    end
+    return Mob
+end
 AutoSaberToggle = FarmTab:AddToggle({
 	Name = "Auto Saber",
 	Default = Settings['Auto Saber'],
@@ -1466,7 +1491,7 @@ function CheckUnlockLegHaki()
             if not Missing then
                 Missing = v.HiddenName
             else
-                Missing = Missing .. ", " .. v.HiddenName
+                Missing = Missing .. ",\n " .. v.HiddenName
             end
         end
     end
@@ -1499,6 +1524,24 @@ rip_indraFarmToggle = FarmTab:AddToggle({
 	end    
 })
 
+FarmTab:AddSection({
+	Name = "Ken Haki Farm"
+})
+
+FarmTab:AddToggle({
+	Name = "Auto Farm Ken Haki",
+	Default = Settings['Auto Farm Ken Haki'],
+	Callback = function(Value)
+        Settings['Auto Farm Ken Haki'] = Value
+	end    
+})
+
+FarmTab:AddButton({
+    Name = "Check Ken Haki Progress",
+    Callback = function()
+        Library.CreateNoti({Desc = "Total dodge times: " .. CommF:InvokeServer("KenTalk", "Status"):split(".")[1], ShowTime = 10})
+    end
+})
 
 getgenv().Allies = {}
 spawn(function()
@@ -1950,6 +1993,29 @@ function MainFarm()
         end
     end
     if not TargetBoss then
+        if Settings['Auto Farm Ken Haki'] then
+            local v = GetMobAura(true)
+            if v then
+                if game.Lighting.ExposureCompensation == 0 then
+                    game:GetService("VirtualInputManager"):SendKeyEvent(true, "K", false, game)
+                    game:GetService("VirtualInputManager"):SendKeyEvent(false, "K", false, game)
+                end
+                repeat wait()
+                    Tween(v.HumanoidRootPart.Position + Vector3.new(0, 5, 0))
+                until not IsMobAlive(v)
+                or game.Lighting.ExposureCompensation == 0
+                or not Settings['Auto Farm Ken Haki']
+                if Settings['Auto Farm Ken Haki'] and game.Lighting.ExposureCompensation == 0 then
+                    HopServer()
+                end
+            else
+                local UnloadMob = GetUnloadedMob()
+                if UnloadMob then
+                    Tween(UnloadMob.HumanoidRootPart.CFrame * CFrame.new(0, Settings['Distance Farm'] * 2, 0))
+                end
+                return
+            end
+        end
         if Settings['Auto Chest'] then
             if Settings['Hop Server after collected 10 Chest'] and CollectedChest >= 10 then
                 HopServer()
@@ -1957,7 +2023,6 @@ function MainFarm()
                 return
             end
             if #getgenv().Chests == 0 then
-                print('v')
                 if not GetChestCheck then
                     delay(10, function()
                         getgenv().GetChestCheck = false
@@ -2004,11 +2069,8 @@ function MainFarm()
                         return
                     end
                 else
-                    print('c')
                     local Chest = GetNearestChest()
-                    print('b')
                     if Chest then
-                        print('a')
                         if Settings['Hop Server after collected 10 Chest'] and plr:DistanceFromCharacter(Chest.Position) > 2000 then
                             HopServer()
                             wait(5)
