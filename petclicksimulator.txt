@@ -2313,11 +2313,7 @@ function MainFarm()
                                 end
                             end
                         else
-                            if Settings['Auto Kill Pirate Ship'] then
-                                CommF:InvokeServer("BuyBoat", "PirateBasic")
-                            else
-                                CommF:InvokeServer("BuyBoat", "Dinghy")
-                            end
+                            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyBoat", "PirateBasic")
                         end
                     else
                         Tween(ShipPos)
