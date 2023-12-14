@@ -208,6 +208,17 @@ if game.PlaceId == 4442272183 then
         table.insert(BossesName, v)
     end
 end
+local Library = {}
+function Library.CreateNoti(Text,time)
+    if typeof(Text) =='table' then
+        Text = tostring(Text)
+    end
+    Window:MakeNotification({
+        Title = "Script Notifications!",
+        Description = Text,
+        Duration = time
+    })
+end
 local EnemySpawns = {}
 for i, v in ipairs(wOrigin.EnemySpawns:GetChildren()) do
     table.insert(EnemySpawns, v)
@@ -447,6 +458,42 @@ getgenv().plrLevel = plr.Data.Level.Value
 plr.Data.Level:GetPropertyChangedSignal("Value"):Connect(function()
     getgenv().plrLevel = plr.Data.Level.Value
 end)
+function HopServer(IgnoreRegion, HopLowServer)
+    if HopLowServer then
+        Library.CreateNoti({Desc = "Hopping Low Player Server", ShowTime = 30})
+    else
+        Library.CreateNoti({Desc = "Hopping Server", ShowTime = 30})
+    end
+    Teleport(IgnoreRegion, HopLowServer)
+end
+function GetNearestPlayerToMFArea(x)
+    local Dist = math.huge
+    local TargetPlayer
+    for i, v in ipairs(game.workspace.Characters:GetChildren()) do
+        if v.Name ~= plr.Name
+        and IsMobAlive(v) then
+            local Mag = (v.HumanoidRootPart.Position - x).magnitude
+            if Mag < Dist then
+                Dist = Mag
+                TargetPlayer = v
+            end
+        end
+    end
+    if TargetPlayer then
+        return (TargetPlayer.HumanoidRootPart.Position - x).magnitude
+    else
+        return 100000
+    end
+end
+function HopIfNearFarmArea(Pos, mag, forced)
+    if not mag then mag = 1000 end
+    if (Settings.MFHopServer or forced)
+    and GetNearestPlayerToMFArea(Pos) < mag then
+        Library.CreateNoti({Desc = "There are players near the auto farm area.", ShowTime = 5})
+        HopServer(false, true)
+        wait(5)
+    end
+end
 function HaveQuest(MobTable, FMob, x)
     if x and #x >= 3 then return
         true
@@ -1056,12 +1103,12 @@ function FarmLocation(Mobs, WaitPos, DisableHop)
             getgenv().WaitSpawnTimer = tick()
         elseif tick() - WaitSpawnTimer > 180 then
             getgenv().WaitSpawnTimer = nil
-            if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
-                Library.CreateNoti({Desc = "Server glitched, mobs not spawning in 3 minutes", ShowTime = 5})
-                HopServer()
+            -- if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
+            --     Library.CreateNoti({Desc = "Server glitched, mobs not spawning in 3 minutes", ShowTime = 5})
+            --     HopServer()
 
-                wait(5)
-            else                               
+            --     wait(5)
+            -- else                               
                 if game.PlaceId == 2753915549 then
                     TPLocation("Underwater City Entrance")
                 elseif game.PlaceId == 4442272183 then
@@ -1069,7 +1116,7 @@ function FarmLocation(Mobs, WaitPos, DisableHop)
                 elseif game.PlaceId == 7449423635 then
                     TPLocation("Castle on the Sea")
                 end
-            end
+            --end
             return
         end
         Tween(WaitPos)
@@ -1077,7 +1124,7 @@ function FarmLocation(Mobs, WaitPos, DisableHop)
 end
 
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/DonandScripts/IjK4rSEaL88KQAF2azTaH3tSTVPGYjbfXgW62mdFNeFMXhtUmq9I8CKPMux5IjK4rSEaL88KQAF2azTaH3tSTVPGYjbfXgW62mdF/main/aaaa")))()
-local Window = OrionLib:MakeWindow({Name = "Adel Hub - BF",IntroEnabled =true,IntroText ='Adel Hub Library',IntroIcon = 'rbxassetid://13779309461' , HidePremium = false, SaveConfig = false, ConfigFolder = "OrionTest"})
+getgenv().Window = OrionLib:MakeWindow({Name = "Adel Hub - BF",IntroEnabled =true,IntroText ='Adel Hub Library',IntroIcon = 'rbxassetid://13779309461' , HidePremium = false, SaveConfig = false, ConfigFolder = "OrionTest"})
 
 local FarmTab = Window:MakeTab({
 	Name = "Farm",
@@ -1440,18 +1487,18 @@ function MainFarm()
             end
         end
         if SelectedFMob then
-            -- if SelectedFMob ~= "Bandit"
-            -- and SelectedFMob ~= "Trainee"
-            -- and plrLevel < 120
-            -- and Settings['Auto Farm'] then
-            --     if not NotiForRetard then
-            --         --Library.CreateNoti({Desc = "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing", ShowTime = 60})
-            --         getgenv().NotiForRetard = true
-            --     end
-            --     --AutoFarmLabel.SetText(LabelTextAF ..  "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing")
-            --     FarmLocation({"Royal Soldier", "Royal Squad"}, CFrame.new(-7806.525390625, 5635.63818359375, -1526.8787841796875))
-            --     return
-            -- end
+            if SelectedFMob ~= "Bandit"
+            and SelectedFMob ~= "Trainee"
+            and plrLevel < 120
+            and Settings['Auto Farm'] then
+                if not NotiForRetard then
+                    Library.CreateNoti({Desc = "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing", ShowTime = 60})
+                    getgenv().NotiForRetard = true
+                end
+                --AutoFarmLabel.SetText(LabelTextAF ..  "(Auto Detect Level) This is the best way to farm from Lvl 10 to 120 so ignore what the script is doing")
+                FarmLocation({"Royal Soldier", "Royal Squad"}, CFrame.new(-7806.525390625, 5635.63818359375, -1526.8787841796875))
+                return
+            end
             if not HaveQuest(MobTable, SelectedFMob, FMob) then
                 if not TargetBoss
                 and SelectedFMob ~= "Factory Staff" then
@@ -1523,7 +1570,7 @@ function MainFarm()
                         elseif tick() - WaitSpawnTimer > 180 then
                             getgenv().WaitSpawnTimer = nil
                             -- if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
-                            --     --Library.CreateNoti({Desc = "Server glitched, mobs not spawning in 3 minutes", ShowTime = 5})
+                            --     Library.CreateNoti({Desc = "Server glitched, mobs not spawning in 3 minutes", ShowTime = 5})
                             --     HopServer()
                             --     wait(5)
                             -- else                               
