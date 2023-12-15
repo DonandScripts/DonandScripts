@@ -111,6 +111,15 @@ elseif game.PlaceId == 7449423635 then
         {Name = "Candy Cane", Pos = CFrame.new(-1046.3201904296875, 14.821266174316406, -14165.2978515625)},
     }
 end
+local RaidBoss = {
+    "The Saw",
+    "Cursed Captain",
+    "Darkbeard",
+    "rip_indra True Form",
+    "Cake Prince",
+    "Dough King",
+    "Soul Reaper",
+}
 if not getgenv().NoclipRun then
     -- setfflag("HumanoidParallelRemoveNoPhysics", "False")
     -- setfflag("HumanoidParallelRemoveNoPhysicsNoSimulate2", "False")
@@ -1488,23 +1497,62 @@ end
 FarmTab:AddSection({
 	Name = "Boss Farm"
 })
-
-local FirstBoss = {
-    "Gorilla King",
-    "Diamond",
-    "Stone"
-}
-
-FarmTab:AddDropdown({
+function GetBoss()
+    local BossesName = {}
+    for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
+        for m, v in pairs(x) do
+            for k, _ in pairs(v.Task) do
+                if v.Task[k] == 1 and QuestNPCs[i] and v.LevelReq then
+                    local d = v.Name
+                    if d == "Ice Admiral" then
+                        d = "Awakened Ice Admiral"
+                    end
+                    Bosses[d] = {
+                        ["QNPC"] = QuestNPCs[i],
+                        ["QPos"] = QuestPoses[QuestNPCs[i]],
+                        ["QName"] = i,
+                        ["QNumber"] = m,
+                        ["QLevel"] = v.LevelReq,
+                    }
+                    table.insert(BossesName, d)
+                end
+            end
+        end
+    end
+    if game.PlaceId == 4442272183 then
+        local ExtraBoss = {
+            "Cursed Captain",
+            "Don Swan"
+        }
+        for i, v in pairs(ExtraBoss) do
+            Bosses[v] = {
+                ["QLevel"] = math.huge,
+            }
+            table.insert(BossesName, v)
+        end
+    end
+    return BossesName
+end
+SelectBossDropdown = FarmTab:AddDropdown({
     Name = "Select Boss",
     Default = Settings['Select Boss'],
-    Options = BossesName,
+    Options = GetBoss(),
     Callback = function(Value)
         Settings['Select Boss'] = Value
     end    
 })
 
-FarmTab:AddToggle({
+FarmTab:AddButton({
+    Name = "Refresh Boss",
+    -- Info = "This is a Button.",
+    Callback = function()
+        if SelectBossDropdown then
+            SelectBossDropdown:Refresh(GetBoss(),true)
+        end
+    end
+})
+
+BossFarmToggle = FarmTab:AddToggle({
     Name = "Auto Farm Boss",
     Default = Settings["Auto Farm Boss"],
     Callback = function(bool)
@@ -1515,6 +1563,14 @@ FarmTab:AddToggle({
             end)
         end
         Settings["Auto Farm Boss"] = bool
+    end
+})
+
+BFHopServerToggle = FarmTab:AddToggle({
+    Name = "Hop Server If no Boss",
+    Default = Settings["Hop Server If no Boss"],
+    Callback = function(bool)
+        Settings["Hop Server If no Boss"] = bool
     end
 })
 
@@ -1718,7 +1774,39 @@ local SelectedFMob
 local MobTable = Bosses
 local Countine
 function MainFarm()
-    local TargetBoss
+    local TargetBoss 
+    if Settings['Auto Farm Boss'] --[[or (Settings.Cuttay and (Settings.CT_FarmBossDrop2 or FarmBossDrop and Settings.CT_FarmBossDrop))]] then
+        local BossList = {}
+        local x = GetBoss()
+        if Settings.Cuttay then
+            x = {}
+            for i, v in pairs(BossDrops[game.PlaceId]) do
+                if not IsHaveItem(i) then
+                    table.insert(x, v)
+                end
+            end
+        end
+        if not Settings.Cuttay
+        or plr.Data.Stats.Melee.Level.Value >= 1200 then
+            for i, v in pairs(x) do
+                if (child_stringfind(game.workspace.Enemies, v, true) == 1
+                or child_stringfind(game.ReplicatedStorage, v, true) == 1)
+                and (plrLevel == MaxLevel
+                or not string.find(plr.PlayerGui.Main.Level.Exp.Text, "2x ends")
+                or table.find(RaidBoss, v)
+                or Bosses[v] and Bosses[v].QPos and plr:DistanceFromCharacter(Bosses[v].QPos.Position) < 1000) then
+                    table.insert(BossList, v)
+                end
+            end
+        end
+        TargetBoss = GetMob(BossList, true)
+        if not TargetBoss
+        and Settings.BFHopServer then
+            HopServer()
+            wait(5)
+            return
+        end
+    end
     -- if Settings['Auto Saber']
     -- and plrLevel >= 300
     -- and not DoneSaber then
@@ -2547,7 +2635,7 @@ function MainFarm()
             return
         end
     end
-    if Settings['Auto Farm'] or TargetBoss then
+    if Settings['Auto Farm'] or TargetBoss and (Settings['Auto Farm Boss'] --[[or Settings.Cuttay]]) then
         if not HaveQuest(MobTable, SelectedFMob, FMob) then 
             Countine = false
         end
@@ -2592,7 +2680,7 @@ function MainFarm()
                         wait(.25)
                     end 
                 until HaveQuest(MobTable, SelectedFMob, FMob)
-                or TargetBoss and (not Settings.BossFarm or child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0)
+                or TargetBoss and (not Settings['Auto Farm Boss'] or child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0)
                 or not TargetBoss and not Settings['Auto Farm']
             end
             repeat wait()
@@ -2609,7 +2697,7 @@ function MainFarm()
                             x:Destroy()
                         end
                     until plr.Data.SpawnPoint.Value == NeatestSpawnPoint
-                    or not Settings.SSPIT or not Settings['Auto Farm'] or TargetBoss and not Settings.BossFarm
+                    or not Settings.SSPIT or not Settings['Auto Farm'] or TargetBoss and not Settings['Auto Farm Boss']
                     repeat wait()
                     until not IsPlayerDead()
                     wait(3)
@@ -2636,7 +2724,7 @@ function MainFarm()
                         AttackMob(v)
                     until not IsMobAlive(v)
                     or not HaveQuest(MobTable, SelectedFMob, FMob)
-                    or TargetBoss and Settings.BossFarm
+                    or TargetBoss and Settings['Auto Farm Boss']
                     or not TargetBoss and not Settings['Auto Farm']
                     or tick() - Timer > 120
                     getgenv().MovingPos = nil
@@ -2685,7 +2773,7 @@ function MainFarm()
                         end
                     end
                 end
-            until TargetBoss and (not Settings.BossFarm or child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0)
+            until TargetBoss and (not Settings['Auto Farm Boss'] or child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0)
             or not TargetBoss and (not Settings['Auto Farm'] or (MobTable[SelectedFMob] and plrLevel >= MobTable[SelectedFMob].QLevel and not plr.PlayerGui.Main.Quest.Visible) or not (MobTable[SelectedFMob] and plrLevel >= MobTable[SelectedFMob].QLevel) and Settings['Auto Farm'])
             wait(.5)
             Countine = true
