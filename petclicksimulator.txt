@@ -1536,6 +1536,7 @@ end
 SelectBossDropdown = FarmTab:AddDropdown({
     Name = "Select Boss",
     Default = Settings['Select Boss'],
+    Multiple = true,
     Options = GetBoss(),
     Callback = function(Value)
         Settings['Select Boss'] = Value
@@ -1777,7 +1778,7 @@ function MainFarm()
     local TargetBoss 
     if Settings['Auto Farm Boss'] --[[or (Settings.Cuttay and (Settings.CT_FarmBossDrop2 or FarmBossDrop and Settings.CT_FarmBossDrop))]] then
         local BossList = {}
-        local x = GetBoss()
+        local x = Settings['Select Boss']
         if Settings.Cuttay then
             x = {}
             for i, v in pairs(BossDrops[game.PlaceId]) do
