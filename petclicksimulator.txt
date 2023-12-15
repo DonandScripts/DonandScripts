@@ -2778,11 +2778,11 @@ function MainFarm()
             or not TargetBoss and (not Settings['Auto Farm'] or (MobTable[SelectedFMob] and plrLevel >= MobTable[SelectedFMob].QLevel and not plr.PlayerGui.Main.Quest.Visible) or not (MobTable[SelectedFMob] and plrLevel >= MobTable[SelectedFMob].QLevel) and Settings['Auto Farm'])
             wait(.5)
             Countine = true
-            for i99,v00 in pairs(Settings['Select Boss']) do 
-                if (table.find(GetBoss(), v00) and Settings['Auto Farm Boss'] or not child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and not child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0) then
-                    Countine = false
-                end
-            end
+            -- for i99,v00 in pairs(Settings['Select Boss']) do 
+            --     if (table.find(GetBoss(), v00) and Settings['Auto Farm Boss'] or not child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and not child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0) then
+            --         Countine = false
+            --     end
+            -- end
         else
             CommF:InvokeServer("AbandonQuest")
             wait(2)
