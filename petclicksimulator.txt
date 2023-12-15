@@ -1808,6 +1808,7 @@ function MainFarm()
             return
         end
     end
+    print(TargetBoss)
     -- if Settings['Auto Saber']
     -- and plrLevel >= 300
     -- and not DoneSaber then
