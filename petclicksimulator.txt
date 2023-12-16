@@ -225,6 +225,31 @@ function Library.CreateNoti(Text)
         Duration = Text.ShowTime
     })
 end
+if not syn then
+    function isnetworkowner2(p1)
+        local A = gethiddenproperty(game.Players.LocalPlayer, "SimulationRadius")
+        local B = game.Players.LocalPlayer.Character or Wait(game.Players.LocalPlayer.CharacterAdded)
+        local C = game.WaitForChild(B, "HumanoidRootPart", 300)
+        if C then
+            if p1.Anchored then
+                return false
+            end
+            if game.IsDescendantOf(p1, B) or (C.Position - p1.Position).Magnitude <= A then
+                return true
+            end
+        end
+        return false
+    end
+end
+local lplr = game.Players.LocalPlayer
+if not isnetworkowner then
+    isnetworkowner = function(part)
+        if isnetworkowner2(part) then
+            return isnetworkowner2(part)
+        end
+        return part.ReceiveAge == 0
+    end
+end
 local EnemySpawns = {}
 for i, v in ipairs(wOrigin.EnemySpawns:GetChildren()) do
     table.insert(EnemySpawns, v)
@@ -921,6 +946,128 @@ function Is1MilFruit()
         end
     end
 end
+local MeshList = {
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10445043756"] = "Leopard Fruit",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10537896371"] = "Dragon Fruit",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10056654383"] = "Control Fruit",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10395893751"] = "Venom Fruit",
+    ["rbxassetid://9425457162"] = "Shadow Fruit",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=9563214715"] = "Dough Fruit",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10774284002"] = "Gravity Fruit",
+    ["rbxassetid://10056526019"] = "Paw Fruit",
+    ["rbxassetid://10444385994"] = "Rumble Fruit",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=9494083159"] = "Bird: Phoenix Fruit",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10142079335"] = "String Fruit",
+    ["rbxassetid://9371699342"] = "Human: Buddha Fruit",
+    ["rbxassetid://9470879314"] = "Quake Fruit",
+    ["rbxassetid://9285667997"] = "Magma Fruit",
+    ["rbxassetid://10056781097"] = "Barrier Fruit",
+    ["rbxassetid://9425346075"] = "Love Fruit",
+    ["rbxassetid://10575195856"] = "Light Fruit",
+    ["rbxassetid://10056754334"] = "Diamond Fruit",
+    ["rbxassetid://10142225958"] = "Revive Fruit",
+    ["rbxassetid://9656045127"] = "Dark Fruit",
+    ["rbxassetid://9450245974"] = "Sand Fruit",
+    ["rbxassetid://9346383748"] = "Ice Fruit",
+    ["rbxassetid://9425207048"] = "Bird: Falcon Fruit",
+    ["rbxassetid://10142175929"] = "Flame Fruit",
+    ["rbxassetid://9307776737"] = "Spike Fruit",
+    ["rbxassetid://9307787860"] = "Smoke Fruit",
+    ["rbxassetid://9307783318"] = "Bomb Fruit",
+    ["rbxassetid://10057133900"] = "Spring Fruit",
+    ["rbxassetid://10119881213"] = "Chop Fruit",
+    ["rbxassetid://9307796569"] = "Spin Fruit",
+    ["rbxassetid://9308099037"] = "Kilo Fruit",
+}
+function GetFruitName(v, spawnmark)
+    if not v:IsA("Model") then return v.Name end
+    local FruitName = "Fruit"
+    local MeshId
+    for i, v in pairs(v:GetDescendants()) do
+        if v:IsA("MeshPart") and v.Name == "Fruit" then
+            MeshId = v.MeshId
+        end
+    end
+    if MeshId then
+        for i, v in pairs(MeshList) do
+            if i == MeshId then
+                FruitName = v
+            end
+        end
+    end
+    if FruitName == "Fruit" then
+        local vF = v:FindFirstChild("Fruit")
+        if vF then
+            if vF:FindFirstChild("Retopo_Cube.001") then
+                FruitName = "Spirit Fruit"
+            elseif vF:FindFirstChild("Gravity cube.026") then
+                FruitName = "Portal Fruit"
+            elseif vF:FindFirstChild("Cube.011") then
+                FruitName = "Rubber Fruit" 
+            end
+        end
+    end
+    if spawnmark then
+        FruitName = FruitName .. " [S]"
+    end
+    return FruitName
+end
+function GetNaturalBloxFruit()
+    local StoredFruits = {}
+    if Settings['No pickup if blox fruit'] then
+        for i, v in pairs(getupvalue(require(plr.PlayerGui.Main.UIController.Inventory).UpdateRender, 4)) do
+            if v.details and v.details.Type == "Blox Fruit" and v.details.Count >= plr.Data.FruitCap.Value then
+                table.insert(StoredFruits, v.details.Name)
+            end
+        end
+    end
+    for i, v in ipairs(game.workspace:GetChildren()) do
+        if v.Name == "Fruit "
+        and v:IsA("Model")
+        and not v:FindFirstChild("Ignored") then
+            local x = GetFruitName(v)
+            local FruitName = FruitNameToFF(x)
+            if not table.find(StoredFruits, FruitName) then
+                return v
+            else
+                local Ignored = Instance.new("IntValue", v)
+                Ignored.Name = "Ignored"
+            end
+        end
+    end
+end
+function GetDroppedFruit()
+    local StoredFruits = {}
+    if Settings['No pickup if blox fruit'] then
+        for i, v in pairs(getupvalue(require(plr.PlayerGui.Main.UIController.Inventory).UpdateRender, 4)) do
+            if v.details and v.details.Type == "Blox Fruit" then
+                table.insert(StoredFruits, v.details.Name)
+            end
+        end
+    end
+    local Dist = math.huge
+    local Fruit
+    for i, v in pairs(game.workspace:GetChildren()) do
+        if v:IsA("Tool")
+        and not v:FindFirstChild("Ignored")
+        and v:FindFirstChild("TouchInterest", true) then
+            local FruitName = FruitNameToFF(v.Name)
+            local x = v:FindFirstChild("TouchInterest", true)
+            if x
+            and not table.find(StoredFruits, FruitName) then
+                local Mag = plr:DistanceFromCharacter(x.Parent.Position)
+                if Mag < Dist then
+                    Dist = Mag
+                    Fruit = x.Parent
+                end
+            else
+                local Ignored = Instance.new("IntValue", v)
+                Ignored.Name = "Ignored"
+            end
+        end
+    end
+    return Fruit
+end
 function GetTreasureFruit(x)
     local Fruits = {}
     for i, v in pairs(getupvalue(require(plr.PlayerGui.Main.UIController.Inventory).UpdateRender, 4)) do
@@ -1483,6 +1630,254 @@ MainTab:AddToggle({
 		Settings['Hop if near player.'] = Value
 	end    
 })
+
+MainTab:AddSection({
+	Name = "Blox Fruit"
+})
+local BloxFruitList = {}
+for i, v in pairs(CommF:InvokeServer("GetFruits")) do
+    table.insert(BloxFruitList, v.Name)
+end
+table.foreach(BloxFruitList, warn)
+function CheckPermBF(i)
+    for _, v in pairs(CommF:InvokeServer("GetFruits")) do
+        if i == v.Name
+        and v.HasPermanent then
+            return true
+        end
+    end
+end
+SelectSnipeBFDropdown = MainTab:AddDropdown({
+	Name = "Select Snipe Devil Fruit",
+	Default = Settings["Select Snipe Devil Fruit"] or {},
+	Options = BloxFruitList,
+	Callback = function(Value)
+        Settings["Select Snipe Devil Fruit"] = Value
+    end    
+})
+spawn(function()
+    while wait(1) do
+        pcall(function()
+            if Settings['Blox Fruit Dealer Sniper'] then
+                if table.find(Settings["Select Snipe Devil Fruit"], tostring(plr.Data.DevilFruit.Value)) then
+                    if BFDealerSniperToggle then BFDealerSniperToggle:Set(false) end
+                    return Library.CreateNoti({Desc = "Already own " .. tostring(plr.Data.DevilFruit.Value), ShowTime = 5})
+                end
+                local FruitPrio = CommF:InvokeServer("GetFruits")
+                table.sort(FruitPrio, function(a, b)
+                    return a.Price > b.Price
+                end)
+                for i, v in pairs(FruitPrio) do
+                    if v.OnSale
+                    and table.find(Settings["Select Snipe Devil Fruit"], v.Name) then
+                        local CurBF = plr.Data.DevilFruit.Value
+                        CommF:InvokeServer("GetFruits")
+                        CommF:InvokeServer("PurchaseRawFruit", v.Name)
+                        wait(2)
+                        if CurBF ~= plr.Data.DevilFruit.Value then
+                            -- if Settings.BFBSDWebhook then
+                            --     SendWebHook({
+                            --         ["content"] = "@everyone",
+                            --         ["embeds"] = {{
+                            --             ["title"] = "Blox Fruits",
+                            --             ["type"] = "rich",
+                            --             ["color"] = tonumber(0xbdce44),
+                            --             ["fields"] = {
+                            --                 {
+                            --                     ["name"] = "Name",
+                            --                     ["value"] = "||" .. plr.Name .. "||",
+                            --                     ["inline"] = false
+                            --                 },
+                            --                 {
+                            --                     ["name"] = "Blox Fruit Dealer Sniper",
+                            --                     ["value"] = "Bought " .. v.Name,
+                            --                     ["inline"] = false
+                            --                 }
+                            --             },
+                            --             ["footer"] = {
+                            --                 ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                            --                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
+                            --             }
+                            --         }}
+                            --     })
+                            -- end
+                            if BFDealerSniperToggle then BFDealerSniperToggle:Set(false) end
+                            Library.CreateNoti({Desc = "Bought " .. v.Name, ShowTime = 5})
+                            break
+                        end
+                    end
+                end
+                wait(10)
+            end
+        end)
+    end
+end)
+BFDealerSniperToggle = MainTab:AddToggle({
+	Name = "Blox Fruit Dealer Sniper",
+	Default = Settings['Blox Fruit Dealer Sniper'],
+	Callback = function(Value)
+		Settings['Blox Fruit Dealer Sniper'] = Value
+	end    
+})
+
+function GetStoreBF(path)
+    for i, v in ipairs(path:GetChildren()) do
+        if string.find(v.Name, " Fruit")
+        and not v:FindFirstChild("Ignored") then
+            return v
+        end
+    end
+end
+function FruitNameToFF(v)
+    v = v:gsub(" Fruit", "")
+    if string.find(v, ":") then
+        local x = v:split(":")
+        v = x[1] .. "-" .. x[1] .. ":" .. x[2]
+    else
+        v = v .. "-" .. v
+    end
+    return v
+end
+function GetDropBF(path)
+    for i, v in ipairs(path:GetChildren()) do
+        if string.find(v.Name, " Fruit")
+        and v:FindFirstChild("Ignored")
+        and not v:FindFirstChild("CantDrop") then
+            return v
+        end
+    end
+end
+function GetNearestLocation(x)
+    local Dist = math.huge
+    local NearestSpawn
+    for i, v in ipairs(wOrigin.Locations:GetChildren()) do
+        local Mag
+        if x then
+            Mag = (x - v.Position).magnitude
+        else
+            Mag = plr:DistanceFromCharacter(v.Position)
+        end
+        if Mag < Dist then
+            Dist = Mag
+            NearestSpawn = v
+        end
+    end
+    return NearestSpawn.Name
+end
+spawn(function()
+    while wait(1) do
+        pcall(function()
+            if Settings['Auto Store Blox Fruit']
+            and not DisableAutoStore then
+                local v = GetStoreBF(plr.Character) or GetStoreBF(plr.Backpack)
+                if v then
+                    getgenv().DisableEquipItem = true
+                    repeat wait()
+                        plr.Character.Humanoid:EquipTool(v)
+                    until v.Parent == plr.Character
+                    or not Settings['Auto Store Blox Fruit']
+                    if Settings['Auto Store Blox Fruit'] then
+                        local FruitName = FruitNameToFF(v.Name)
+                        local StoreBF = CommF:InvokeServer("StoreFruit", FruitName, v)
+                        if StoreBF then
+                            Library.CreateNoti({Desc = "Stored Blox Fruit " .. FruitName, ShowTime = 5})
+                            -- if Settings.BFBSDWebhook then
+                            --     local PingEvery1 = ""
+                            --     if table.find(OneMilFruits, v.Name) then
+                            --         PingEvery1 = "@everyone"
+                            --     end
+                            --     SendWebHook({
+                            --         ["content"] = PingEvery1,
+                            --         ["embeds"] = {{
+                            --             ["title"] = "Blox Fruits",
+                            --             ["type"] = "rich",
+                            --             ["color"] = tonumber(0xbdce44),
+                            --             ["fields"] = {
+                            --                 {
+                            --                     ["name"] = "Name",
+                            --                     ["value"] = "||" .. plr.Name .. "||",
+                            --                     ["inline"] = false
+                            --                 },
+                            --                 {
+                            --                     ["name"] = "Auto Store Blox Fruit",
+                            --                     ["value"] = "Stored " .. v.Name,
+                            --                     ["inline"] = false
+                            --                 }
+                            --             },
+                            --             ["footer"] = {
+                            --                 ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                            --                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
+                            --             }
+                            --         }}
+                            --     })
+                            -- end
+                        else
+                            Library.CreateNoti({Desc = "Maxed amount to store Blox Fruit " .. FruitName, ShowTime = 5})
+                            plr.Character.Humanoid:UnequipTools()
+                            local Ignored = Instance.new("IntValue", v)
+                            Ignored.Name = "Ignored"
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+AutoStoreBFToggle = MainTab:AddToggle({
+	Name = "Auto Store Blox Fruit",
+	Default = Settings['Auto Store Blox Fruit'],
+	Callback = function(Value)
+		Settings['Auto Store Blox Fruit'] = Value
+	end    
+})
+
+TweenBFToggle= MainTab:AddToggle({
+	Name = "Auto Collect Blox Fruit",
+	Default = Settings['Auto Collect Fruit'],
+    Info = 'Will auto collect dropped fruit by players.',
+	Callback = function(Value)
+        if Settings['Auto Collect Fruit'] and not Value then
+            spawn(function()
+                wait(.5)
+                ForceStopTween(true)
+            end)
+        end
+		Settings['Auto Collect Fruit'] = Value
+	end    
+})
+
+TweenNBFToggle= MainTab:AddToggle({
+	Name = "Auto Collect Natural Blox Fruit",
+	Default = Settings['Auto Collect Natural Blox Fruit'],
+    Info = 'Will auto collect fruit natural spawned Blox Fruits.',
+	Callback = function(Value)
+        if Settings['Auto Collect Natural Blox Fruit'] and not Value then
+            spawn(function()
+                wait(.5)
+                ForceStopTween(true)
+            end)
+        end
+		Settings['Auto Collect Natural Blox Fruit'] = Value
+	end    
+})
+
+NPIIIToggle= MainTab:AddToggle({
+	Name = "No pickup if blox fruit",
+    Info = 'Will no pickup if blox fruit already have in Inventory.',
+	Default = Settings['No pickup if blox fruit'],
+	Callback = function(Value)
+		Settings['No pickup if blox fruit'] = Value
+	end    
+})
+NPIIIToggle= MainTab:AddToggle({
+	Name = "Hop Server if no Fruit",
+	Default = Settings['Hop Server if no Fruit'],
+	Callback = function(Value)
+		Settings['Hop Server if no Fruit'] = Value
+	end    
+})
+
 MainTab:AddSection({
 	Name = "Auto Chest"
 })
@@ -2044,6 +2439,69 @@ function MainFarm()
             HopServer()
             wait(5)
             return
+        end
+    end
+    if Settings['Auto Collect Natural Blox Fruit'] and (not ASWeapon or ASWeapon ~= "Tushita") then
+        local v = GetNaturalBloxFruit()
+        if v then
+            getgenv().DisableEquipItem = true
+            --AutoFarmLabel.SetText(LabelTextAF ..  "Picking up Natural spawned Blox Fruit")
+            local FruitRoot = v:FindFirstChild("Handle") or v:FindFirstChild("Fruit")
+            if FruitRoot:IsA("Model") then
+                FruitRoot = FruitRoot:FindFirstChild("RootPart")
+            end
+            local PickupTimer
+            repeat wait(1)
+                Tween(FruitRoot.Position, true, 200)
+                if plr:DistanceFromCharacter(FruitRoot.Position) < 100 and not PickupTimer then
+                    PickupTimer = tick()
+                end
+            until not v or not v.Parent
+            or not FruitRoot or not FruitRoot.Parent
+            or PickupTimer and tick() - PickupTimer > 60
+            or not Settings['Auto Collect Natural Blox Fruit']
+            if PickupTimer and tick() - PickupTimer > 60 and v and FruitRoot then
+                local Ignored = Instance.new("IntValue", v)
+                Ignored.Name = "Ignored"
+            end
+            return
+        elseif not TargetBoss then
+            if Settings['Hop Server if no Fruit']
+            and not Settings['Auto Collect Fruit']
+            and not Settings.AutoRaid then
+                HopServer(true)
+                wait(5)
+                return
+            end
+            if not Settings['Auto Collect Fruit'] then
+                getgenv().DisableEquipItem = false
+            end
+        end
+    end
+    if Settings['Auto Collect Fruit'] and (not ASWeapon or ASWeapon ~= "Tushita") then
+        local v = GetDroppedFruit()
+        if v then
+            getgenv().DisableEquipItem = true
+            --AutoFarmLabel.SetText(LabelTextAF ..  "Picking up dropped Blox Fruit")
+            if plr:DistanceFromCharacter(v.Position) < 1000 then
+                firetouchinterest(plr.Character.HumanoidRootPart, v, 0)
+                firetouchinterest(plr.Character.HumanoidRootPart, v, 1)
+            else
+                Tween(v.Position + Vector3.new(0, 5, 0), true, 200)
+            end
+            if Settings.AutoRaid then
+                plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 100, 0)
+            end
+            wait(1)
+            return
+        elseif not TargetBoss then
+            if Settings['Hop Server if no Fruit']
+            and not Settings.AutoRaid then
+                HopServer(true)
+                wait(5)
+                return
+            end
+            getgenv().DisableEquipItem = false
         end
     end
     -- if Settings['Auto Saber']
