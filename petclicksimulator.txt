@@ -1963,6 +1963,416 @@ if game.PlaceId ~= 2753915549 then
     })
 end
 
+MainTab:AddSection({
+	Name = "ESP"
+})
+function GetPlayer()
+	local player
+	for i, v in ipairs(game.Players:GetChildren()) do
+		if v.Name ~= plr.Name
+        and v.Character
+		and v.Character:FindFirstChild("HumanoidRootPart")
+		and not v.Character.HumanoidRootPart:FindFirstChild("Ignored") then
+			player = v.Character
+		end
+	end
+	return player
+end
+spawn(function()
+    while wait(1) do
+		pcall(function()
+            if Settings['Players ESP'] then
+                local v = GetPlayer()
+                if v then
+                    local Ignored = Instance.new("IntValue", v.HumanoidRootPart)
+                    Ignored.Name = "Ignored"
+                    local Text = Drawing.new("Text")
+                    Text.Visible = false
+                    Text.Transparency = 1
+                    Text.Text = v.Name
+                    Text.Color = game.Players[v.Name].TeamColor.Color
+                    Text.Size = 20
+                    Text.Outline = true
+                    Text.OutlineColor = Color3.fromRGB(0, 0, 0)
+                    Text.Center = true
+                    Text.Font = 1
+                    spawn(function()
+                        repeat wait()
+                            if v:FindFirstChild("HumanoidRootPart") then
+                                local Pos, OnScreen = CurCam:WorldToViewportPoint(v.HumanoidRootPart.Position)
+                                if OnScreen then
+                                    Text.Text = v.Name .. " (" .. math.round(plr:DistanceFromCharacter(v.HumanoidRootPart.Position)) .. ")"
+                                    Text.Position = Vector2.new(Pos.X, Pos.Y - 20)
+                                    Text.Visible = true
+                                    if Targeting
+                                    and Settings.SilentAim
+                                    and v.Name == Targeting then
+                                        Text.Color = Color3.fromRGB(130, 0, 255)
+                                    elseif game.Players:FindFirstChild(v.Name) then
+                                        Text.Color = game.Players[v.Name].TeamColor.Color
+                                    end
+                                else
+                                    Text.Visible = false
+                                end
+                            end
+                        until not v or not v.Parent or not game.Players:FindFirstChild(v.Name)
+                        or not IsMobAlive(v)
+                        or not Settings['Players ESP']
+                        Text:Remove()
+                        if v then
+                            Ignored:Destroy()
+                        end
+                    end)
+                end
+            end
+		end)
+	end
+end)
+MainTab:AddToggle({
+	Name = "Players ESP",
+	Default = Settings['Players ESP'],
+	Callback = function(Value)
+		Settings['Players ESP'] = Value
+	end    
+})
+function GetBloxFruit()
+    for i, v in ipairs(game.workspace:GetChildren()) do
+        if string.find(v.Name, "Fruit") and not v:FindFirstChild("ESP_Ignored") then
+            return v
+        end
+    end
+end
+spawn(function()
+    while wait(1) do
+		pcall(function()
+            if Settings['Blox Fruit ESP'] then
+                local v = GetBloxFruit()
+                if v then   
+                    local FruitRoot = v:FindFirstChild("Handle") or v:FindFirstChild("Fruit")
+                    if FruitRoot:IsA("Model") then
+                        FruitRoot = FruitRoot:FindFirstChild("RootPart")
+                    end
+                    local Ignored = Instance.new("IntValue", v)
+                    Ignored.Name = "ESP_Ignored"
+                    local Text = Drawing.new("Text")
+                    Text.Visible = false
+                    Text.Transparency = 1
+                    Text.Text = v.Name
+                    Text.Color = Color3.fromRGB(240, 240, 240)
+                    Text.Size = 25
+                    Text.Outline = true
+                    Text.OutlineColor = Color3.fromRGB(0, 0, 0)
+                    Text.Center = true
+                    Text.Font = 1
+                    spawn(function()
+                        repeat wait()
+                            local Pos, OnScreen = CurCam:WorldToViewportPoint(FruitRoot.Position)
+                            if OnScreen then
+                                Text.Text = GetFruitName(v, true) .. " (" .. math.round(plr:DistanceFromCharacter(FruitRoot.Position)) .. ")"
+                                Text.Position = Vector2.new(Pos.X, Pos.Y - 20)
+                                Text.Visible = true
+                            else
+                                Text.Visible = false
+                            end
+                        until not v or not v.Parent or v.Parent ~= game.workspace
+                        or not Settings['Blox Fruit ESP']
+                        Text:Remove()
+                        if v then
+                            Ignored:Destroy()
+                        end
+                    end)
+                end
+            end
+		end)
+	end
+end)
+function GetChest()
+    for i, v in ipairs(game.workspace:GetChildren()) do
+        if string.find(v.Name, "Chest")
+        and not v:FindFirstChild("Ignored")
+        and v:IsA("Part") then
+            return v
+        end
+    end
+    for i, v in ipairs(game.workspace.Map:GetDescendants()) do
+        if string.find(v.Name, "Chest")
+        and not v:FindFirstChild("Ignored")
+        and v:IsA("Part") then
+            return v
+        end
+    end
+end
+function CreateChestESP(v)
+    local Ignored = Instance.new("IntValue", v)
+    Ignored.Name = "Ignored"
+    local Text = Drawing.new("Text")
+    Text.Visible = false
+    Text.Transparency = 1
+    Text.Text = v.Name
+    Text.Color = Color3.fromRGB(237, 197, 64)
+    Text.Size = 21
+    Text.Outline = true
+    Text.OutlineColor = Color3.fromRGB(0, 0, 0)
+    Text.Center = true
+    Text.Font = 1
+    spawn(function()
+        repeat wait()
+            local Pos, OnScreen = CurCam:WorldToViewportPoint(v.Position)
+            if OnScreen then
+                Text.Text = v.Name .. " (" .. math.round(plr:DistanceFromCharacter(v.Position)) .. ")"
+                Text.Position = Vector2.new(Pos.X, Pos.Y - 20)
+                Text.Visible = true
+            else
+                Text.Visible = false
+            end
+        until not v or not v.Parent
+        or not Settings['Blox Fruit ESP']
+        Text:Remove()
+        if v then
+            Ignored:Destroy()
+        end
+    end)
+end
+spawn(function()
+    while wait(10) do
+		pcall(function()
+            if Settings['Blox Fruit ESP'] then
+                local v = GetChest()
+                if v then
+                    CreateChestESP(v)
+                end
+            end
+		end)
+	end
+end)
+MainTab:AddToggle({
+	Name = "Blox Fruit ESP",
+	Default = Settings['Blox Fruit ESP'],
+	Callback = function(Value)
+		Settings['Blox Fruit ESP'] = Value
+	end    
+})
+
+MainTab:AddToggle({
+	Name = "Chest ESP",
+	Default = Settings['Chest ESP'],
+	Callback = function(Value)
+		Settings['Chest ESP'] = Value
+	end    
+})
+
+if game.PlaceId == 4442272183 then
+    function GetFlower()
+        for i, v in ipairs(game.workspace:GetChildren()) do
+            if string.find(v.Name, "Flower") and not v:FindFirstChild("ESP_Ignored") then
+                return v
+            end
+        end
+    end
+    spawn(function()
+        while wait(1) do
+            pcall(function()
+                if Settings['Flower ESP'] then
+                    local v = GetFlower()
+                    if v then
+                        local Ignored = Instance.new("IntValue", v)
+                        Ignored.Name = "ESP_Ignored"
+                        local Text = Drawing.new("Text")
+                        Text.Visible = false
+                        Text.Transparency = 1
+                        Text.Size = 25
+                        Text.Outline = true
+                        Text.OutlineColor = Color3.fromRGB(0, 0, 0)
+                        Text.Center = true
+                        Text.Font = 1
+                        local TText
+                        if v.Color == Color3.fromRGB(33, 84, 185) then
+                            TText = "Blue Flower"
+                            Text.Color = Color3.fromRGB(33, 84, 185)
+                        elseif v.Color == Color3.fromRGB(163, 75, 75) then
+                            TText = "Red Flower"
+                            Text.Color = Color3.fromRGB(163, 75, 75)
+                        end
+                        Text.Text = TText
+                        spawn(function()
+                            repeat wait()
+                                local Pos, OnScreen = CurCam:WorldToViewportPoint(v.Position)
+                                if OnScreen then
+                                    Text.Text = TText .. " (" .. math.round(plr:DistanceFromCharacter(v.Position)) .. ")"
+                                    Text.Position = Vector2.new(Pos.X, Pos.Y - 20)
+                                    Text.Visible = true
+                                else
+                                    Text.Visible = false
+                                end
+                            until not v or not v.Parent
+                            or not Settings['Flower ESP']
+                            Text:Remove()
+                            if v then
+                                Ignored:Destroy()
+                            end
+                        end)
+                    end
+                end
+            end)
+        end
+    end)
+    MainTab:AddToggle({
+        Name = "Flower ESP",
+        Default = Settings['Flower ESP'],
+        Callback = function(Value)
+            Settings['Flower ESP'] = Value
+        end    
+    })
+end
+
+MainTab:AddToggle({
+    Name = "Island ESP",
+    Default = Settings['Island ESP'],
+    Callback = function(Value)
+        spawn(function()
+            if Value then
+                for i, v in pairs(Locations) do
+                    local Text = Drawing.new("Text")
+                    Text.Visible = false
+                    Text.Transparency = 1
+                    Text.Text = v.Name
+                    Text.Color = Color3.fromRGB(150, 150, 150)
+                    Text.Size = 20
+                    Text.Outline = true
+                    Text.OutlineColor = Color3.fromRGB(0, 0, 0)
+                    Text.Center = true
+                    Text.Font = 1
+                    spawn(function()
+                        repeat wait()
+                            local Pos, OnScreen = CurCam:WorldToViewportPoint(Vector3.new(v.Pos.Position.X, v.Pos.Position.Y, v.Pos.Position.Z))
+                            if OnScreen then
+                                Text.Text = v.Name.. " (" .. math.round(plr:DistanceFromCharacter(v.Pos.Position)) .. ")"
+                                Text.Position = Vector2.new(Pos.X, Pos.Y - 20)
+                                Text.Visible = true
+                            else
+                                Text.Visible = false
+                            end
+                        until not Settings['Island ESP']
+                        Text:Remove()
+                    end)
+                end
+            end
+        end)
+        Settings['Island ESP'] = Value
+    end    
+})
+
+MainTab:AddSection({
+	Name = "Performance"
+})
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local WindowFocusReleasedFunction = function()
+    getgenv().TabStatus = "Out"
+    if Settings.BoostFPS then
+        RunService:Set3dRenderingEnabled(false)
+    end
+end
+local WindowFocusedFunction = function()
+    getgenv().TabStatus = "In"
+    if Settings.BoostFPS then
+        RunService:Set3dRenderingEnabled(true)
+    end
+end
+UserInputService.WindowFocusReleased:Connect(WindowFocusReleasedFunction)
+UserInputService.WindowFocused:Connect(WindowFocusedFunction)
+game.workspace.Terrain.ChildAdded:Connect(function(v)
+    if Settings.BoostFPS and v.Name == "Attachment" and v:FindFirstChild("Trail") then
+        v.Trail.Enabled = false
+    end
+end)
+
+BoostFPSToggle = MainTab:AddToggle({
+    Name = "Boost FPS",
+    Default = Settings['Boost FPS'],
+    Callback = function(Value)
+        Settings['Boost FPS'] = Value
+        spawn(function()
+            if Value and not BoostedFPS then
+                getgenv().BoostedFPS = true
+                game:GetService("RunService"):Set3dRenderingEnabled(true)
+                local Lighting = game:GetService("Lighting")
+                local Terrain = workspace:FindFirstChildOfClass("Terrain")
+                sethiddenproperty(Terrain, "Decoration", false)
+                sethiddenproperty(game.Lighting, "Technology", 0)
+                settings().Rendering.QualityLevel = 1
+                Lighting.GlobalColorCorrection.Enabled = false
+                Lighting.Brightness = 0 
+                pcall(function()
+                    Terrain.WaterWaveSize = 0
+                    Terrain.WaterWaveSpeed = 0
+                    Terrain.WaterReflectance = 0
+                    Terrain.WaterTransparency = 0
+                end)
+                for i, v in ipairs(Lighting:GetDescendants()) do
+                    if v:IsA("BlurEffect")
+                    or v:IsA("SunRaysEffect")
+                    or v:IsA("BloomEffect")
+                    or v:IsA("DepthOfFieldEffect") then
+                        v.Enabled = false
+                    end
+                end
+                wait(1)
+                for i, v in ipairs(workspace:GetDescendants()) do
+                    if v:IsA("Part")
+                    or v:IsA("SpawnLocation")
+                    or v:IsA("WedgePart")
+                    or v:IsA("Terrain")
+                    or v:IsA("UnionOperation")
+                    or v:IsA("CornerWedgePart")
+                    or v:IsA("TrussPart") then
+                        v.Material = "Plastic"
+                        v.Reflectance = 0
+                    elseif v:IsA("MeshPart") then
+                        v.Material = "Plastic"
+                        v.Reflectance = 0
+                        v.TextureID = ""
+                    elseif v.ClassName == "Decal"
+                    or v.ClassName == "Texture" then
+                        v.Transparency = 1
+                    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                        v.Lifetime = NumberRange.new(0)
+                    elseif v:IsA("Explosion") then
+                        v.BlastPressure = 1
+                        v.BlastRadius = 1
+                    end
+                end
+                wait(3)
+                FireButton(plr.PlayerGui.Main.Settings.FastModeButton)
+            end
+        end)
+    end    
+})
+
+MainTab:AddToggle({
+    Name = "Remove Screen Shake",
+    Default = Settings['Remove Screen Shake'],
+    Callback = function(Value)
+        Settings['Remove Screen Shake'] = Value
+        if Value and not RunRemoveScreenShake then
+            getgenv().RunRemoveScreenShake = true
+            require(game.ReplicatedStorage.Util.CameraShaker):Stop()
+        end
+    end    
+})
+
+MainTab:AddToggle({
+    Name = "No Fog",
+    Default = Settings['No Fog'],
+    Callback = function(Value)
+        Settings['No Fog'] = Value
+        if Value and game.Lighting:FindFirstChild("LightingLayers") then
+            game.Lighting.LightingLayers:Destroy()
+        end
+    end    
+})
+
 
 local FarmTab = Window:MakeTab({
 	Name = "Farm",
