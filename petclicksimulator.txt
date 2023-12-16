@@ -474,6 +474,180 @@ function FindMobExist(v)
         return true
     end
 end
+loadstring([[
+    local PlaceID = game.PlaceId
+    local AllIDs = {}
+    local foundAnything = ""
+    local actualHour = os.date("!*t").hour
+    local Deleted = false
+    local File = pcall(function()
+        AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json"))
+    end)
+    if not File then
+        table.insert(AllIDs, actualHour)
+        writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+    end
+    function TPReturner()
+        local Site;
+        if foundAnything == "" then
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+        else
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+        end
+        local ID = ""
+        if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+            foundAnything = Site.nextPageCursor
+        end
+        local num = 0;
+        for i,v in pairs(Site.data) do
+            local Possible = true
+            ID = tostring(v.id)
+            if tonumber(v.maxPlayers) > tonumber(v.playing)
+            and tonumber(v.playing) <= 2 then
+                for _,Existing in pairs(AllIDs) do
+                    if num ~= 0 then
+                        if ID == tostring(Existing) then
+                            Possible = false
+                        end
+                    else
+                        if tonumber(actualHour) ~= tonumber(Existing) then
+                            local delFile = pcall(function()
+                                delfile("NotSameServers.json")
+                                AllIDs = {}
+                                table.insert(AllIDs, actualHour)
+                            end)
+                        end
+                    end
+                    num = num + 1
+                end
+                if Possible == true then
+                    table.insert(AllIDs, ID)
+                    wait()
+                    pcall(function()
+                        writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+                        wait()
+                        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+                    end)
+                    wait(4)
+                end
+            end
+        end
+    end
+    
+    getgenv().TeleportLow = function()
+        pcall(function()
+            TPReturner()
+            if foundAnything ~= "" then
+                TPReturner()
+            end
+        end)
+    end
+]])()
+
+loadstring([[
+    local S = {}
+    local HttpService = game:GetService("HttpService")
+    local SaveFileName = "BloxFruit_BlacklistServers.json"
+    
+    function SaveS()
+        local HttpService = game:GetService("HttpService")
+        if not isfolder("Adel Hub") then
+            makefolder("Adel Hub")
+        end
+        writefile("Adel Hub/" .. SaveFileName, HttpService:JSONEncode(S))
+    end
+    
+    function ReadS() 
+        local s,e = pcall(function() 
+            local HttpService = game:GetService("HttpService")
+            if not isfolder("Adel Hub") then
+                makefolder("Adel Hub")
+            end
+            return HttpService:JSONDecode(readfile("Adel Hub/" .. SaveFileName))
+        end)
+        if s then return e 
+        else
+            SaveS()
+            return ReadS()
+        end
+    end
+    S = ReadS()
+    local function Hop(IgnoreRegion) 
+        for i = 1, 100 do 
+            local huhu = game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer(i)
+            if huhu then
+                for k,v in pairs(huhu) do 
+                    if v.Count <= 11
+                    and (IgnoreRegion
+                    or not Settings.HopServerRegion
+                    or Settings.HopServerRegion == "Random"
+                    or string.find(v.Region, Settings.HopServerRegion)) then 
+                        if not S[k] or tick() - S[k].Time > 60 * 60  then 
+                            S = ReadS()
+                            S[k] = {
+                                Time = tick()
+                            }
+                            SaveS()
+                           game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer("teleport",k)
+                           return true
+                        elseif tick() - S[k].Time > 60 * 60 then
+                            S[k] = nil 
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end 
+    getgenv().Teleport = function(IgnoreRegion, HopLowServer) 
+        local x = plr.Character:FindFirstChild("Chop Glitch Fix")
+        if x then
+            x:Destroy()
+        end
+        getgenv().Hopping = true
+        if not getgenv().Loaded then 
+            local function child(v)
+                if v.Name == "ErrorPrompt" then 
+                    if v.Visible then 
+                        if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then 
+                            Teleport()
+                        end
+                    end
+                    v:GetPropertyChangedSignal("Visible"):Connect(function() 
+                        if v.Visible then 
+                            if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then 
+                                Teleport()
+                            end
+                        end
+                    end)
+                end
+            end
+            for k, v in pairs(game.CoreGui.RobloxPromptGui.promptOverlay:GetChildren()) do 
+                child(v)
+            end
+            game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(child)
+            getgenv().Loaded = true
+        end
+        while wait() do
+            pcall(function()
+                if not plr.PlayerGui.Main.InCombat.Visible and not DisableEquipItem then
+                    if HopLowServer then
+                        if not TeleportingLow then
+                            getgenv().TeleportingLow = tick()
+                        end
+                        if tick() - TeleportingLow < 10 then
+                            TeleportLow()
+                        else
+                            Hop(IgnoreRegion)
+                        end
+                    else
+                        Hop(IgnoreRegion)
+                    end
+                end
+            end)
+        end
+    end
+]])()
 function HopServer(IgnoreRegion, HopLowServer)
     if HopLowServer then
         Library.CreateNoti({Desc = "Hopping Low Player Server", ShowTime = 30})
@@ -660,6 +834,21 @@ function GetM1WP(x)
     for i, v in ipairs(plr.Character:GetChildren()) do 
         if v:IsA("Tool") and v.ToolTip == x then
             return v.Name
+        end
+    end
+end
+function GetPirateRaid(path)
+    if path then
+        path = game.ReplicatedStorage
+    else
+        path = game.workspace.Enemies
+    end
+    for i, v in ipairs(path:GetChildren()) do
+        if string.find(v.Name, "Lv.")
+        and not string.find(v.Name, "Boss")
+        and IsMobAlive(v)
+        and (v.HumanoidRootPart.Position - Vector3.new(-5543, 313, -2964)).magnitude < 1000 then
+            return v
         end
     end
 end
@@ -1372,7 +1561,7 @@ if game.PlaceId ~= 2753915549 then
     MainTab:AddToggle({
         Name = 'Disable if got ' .. WorldReward,
         Default = Settings['Disable if got mythic item'],
-        Info = 'Will not hop server / stop collecting chest and tween to ' .. SafeZone .. ' if got ' .. WorldReward .. '.',
+        Info = 'Will not hop server and stop collecting chest and tween to ' .. SafeZone .. ' if got ' .. WorldReward .. '.',
         Callback = function(Value)
             Settings['Disable if got mythic item'] = Value
         end    
@@ -1494,6 +1683,35 @@ if game.PlaceId ~= 7449423635 then
     })
 elseif Settings['Auto Next Sea'] then
     Settings['Auto Next Sea'] = false
+end
+
+if game.PlaceId ~= 2753915549 then
+    local x, m = "Auto Pirate Raid", "Will auto kill pirate raid when the raid event spawn."
+    if game.PlaceId == 4442272183 then
+        x, m = "Auto Factory", "Will auto kill factory when the factory event spawn."
+    end
+    AutoWorldEventToggle = FarmTab:AddToggle({
+        Name = x,
+        Default = Settings['Auto Farm Event'],
+        Info = m,
+        Callback = function(Value)
+            if Settings['Auto Farm Event'] and Value then
+                spawn(function()
+                    wait(.5)
+                    getgenv().PirateRaiding = false
+                    ForceStopTween(true)
+                end)
+            end
+            Settings['Auto Farm Event'] = Value
+        end
+    })
+    FarmTab:AddToggle({
+        Name = "Hop Server if no " .. x:gsub("Auto ", ""),
+        Default = Settings['AutoFE Hop'],
+        Callback = function(Value)
+            Settings['AutoFE Hop'] = Value
+        end
+    })
 end
 
 FarmTab:AddSection({
@@ -1731,6 +1949,70 @@ local SelectedFMob
 local MobTable = Bosses
 local Countine
 function MainFarm()
+    if game.PlaceId ~= 2753915549
+    and Settings['Auto Farm Event']
+    and ASWeapon ~= "Tushita" then
+        if game.PlaceId == 7449423635 then
+            if PirateRaiding then
+                --AutoFarmLabel.SetText(LabelTextAF ..  "Killing Raid Pirates")
+                local v = GetPirateRaid()
+                if v then
+                    repeat wait()
+                        AttackMob(v)
+                    until not IsMobAlive(v)
+                    or not Settings['Auto Farm Event']
+                    if not GetPirateRaid() and Settings['Auto Farm Event'] then
+                        local Timer = tick()
+                        repeat wait(1)
+                        until GetPirateRaid()
+                        or tick() - Timer > 10
+                        or not Settings['Auto Farm Event'] 
+                        if tick() - Timer > 10 and not GetPirateRaid() then
+                            getgenv().PirateRaiding = false
+                        end
+                    end
+                    return
+                else
+                    local UnloadMob = GetPirateRaid(true)
+                    if UnloadMob then
+                        Tween(UnloadMob.HumanoidRootPart.CFrame * CFrame.new(0, Settings['Distance Farm'] * 2, 0))
+                    end
+                    return
+                end
+            elseif not PirateRaidCheck then
+                getgenv().PirateRaidCheck = true
+                delay(10, function()
+                    getgenv().PirateRaidCheck = false
+                end)
+                if GetPirateRaid() or GetPirateRaid(true) then
+                    getgenv().PirateRaiding = true
+                end
+            elseif Settings['AutoFE Hop'] then
+                HopServer(true)
+                wait(5)
+                return
+            end
+        else
+            local x = "Core"
+            local v = GetMob(x)
+            if v then
+                --AutoFarmLabel.SetText(LabelTextAF ..  "Attacking " .. x)
+                repeat wait()
+                    AttackMob(v)
+                until not IsMobAlive(v)
+            else
+                local UnloadBoss = child_stringfind(game.ReplicatedStorage, x, true, true)
+                if UnloadBoss then
+                    Tween(UnloadBoss.HumanoidRootPart.CFrame * CFrame.new(0, Settings['Distance Farm'] * 2, 0))
+                    return
+                elseif Settings['AutoFE Hop'] then
+                    HopServer(true)
+                    wait(5)
+                    return
+                end
+            end
+        end
+    end
     local TargetBoss 
     if Settings['Auto Farm Boss'] --[[or (Settings.Cuttay and (Settings.CT_FarmBossDrop2 or FarmBossDrop and Settings.CT_FarmBossDrop))]] then
         local BossList = {}
@@ -1758,7 +2040,7 @@ function MainFarm()
         end
         TargetBoss = GetMob(BossList, true)
         if not TargetBoss
-        and Settings.BFHopServer then
+        and Settings["Hop Server If no Boss"] then
             HopServer()
             wait(5)
             return
@@ -2167,7 +2449,7 @@ function MainFarm()
                 --             },
                 --             ["footer"] = {
                 --                 ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
-                --                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
+                --                 ["text"] = "Adel Hub (" .. os.date("%X") .. ")"
                 --             }
                 --         }}
                 --     })
@@ -2222,7 +2504,7 @@ function MainFarm()
                 --             },
                 --             ["footer"] = {
                 --                 ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
-                --                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
+                --                 ["text"] = "Adel Hub (" .. os.date("%X") .. ")"
                 --             }
                 --         }}
                 --     })
@@ -2466,7 +2748,7 @@ function MainFarm()
                     --             },
                     --             ["footer"] = {
                     --                 ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
-                    --                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
+                    --                 ["text"] = "Adel Hub (" .. os.date("%X") .. ")"
                     --             }
                     --         }}
                     --     })
