@@ -823,14 +823,16 @@ function GetMob(FMob, UnloadBoss)
         FMob = {FMob}
     end
     if UnloadBoss then
-        for i, v in ipairs(game.ReplicatedStorage:GetChildren()) do
-            if string.find(v.Name, "Boss")
-            and IsMobAlive(v) then
-                v.Parent = game.workspace.Enemies
+        for i0 = 1,10 do 
+            for i, v in ipairs(game.ReplicatedStorage:GetChildren()) do
+                if string.find(v.Name, "Boss")
+                and IsMobAlive(v) then
+                    v.Parent = game.workspace.Enemies
+                end
             end
         end
     end
-    local x = game.workspace.Enemies:GetChildren() or game.ReplicatedStorage:GetChildren()
+    local x = game.workspace.Enemies:GetChildren()
     if #x > 1 and Settings['Bring Mob'] then
         local MCounter = 0
         local MidPos
