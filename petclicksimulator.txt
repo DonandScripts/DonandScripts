@@ -825,7 +825,7 @@ function GetMob(FMob, UnloadBoss)
     if UnloadBoss then
         for i0 = 1,10 do 
             for i, v in ipairs(game.ReplicatedStorage:GetChildren()) do
-                if string.find(v.Name, "Boss")
+                if string.find(v.Name, "Boss") or table.find(BossesName, v.Name)
                 and IsMobAlive(v) then
                     v.Parent = game.workspace.Enemies
                 end
@@ -1499,60 +1499,14 @@ end
 FarmTab:AddSection({
 	Name = "Boss Farm"
 })
-function GetBoss()
-    local BossesName = {}
-    for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
-        for m, v in pairs(x) do
-            for k, _ in pairs(v.Task) do
-                if v.Task[k] == 1 and QuestNPCs[i] and v.LevelReq then
-                    local d = v.Name
-                    if d == "Ice Admiral" then
-                        d = "Awakened Ice Admiral"
-                    end
-                    Bosses[d] = {
-                        ["QNPC"] = QuestNPCs[i],
-                        ["QPos"] = QuestPoses[QuestNPCs[i]],
-                        ["QName"] = i,
-                        ["QNumber"] = m,
-                        ["QLevel"] = v.LevelReq,
-                    }
-                    table.insert(BossesName, d)
-                end
-            end
-        end
-    end
-    if game.PlaceId == 4442272183 then
-        local ExtraBoss = {
-            "Cursed Captain",
-            "Don Swan"
-        }
-        for i, v in pairs(ExtraBoss) do
-            Bosses[v] = {
-                ["QLevel"] = math.huge,
-            }
-            table.insert(BossesName, v)
-        end
-    end
-    return BossesName
-end
 SelectBossDropdown = FarmTab:AddDropdown({
     Name = "Select Boss",
     Default = Settings['Select Boss'] or {},
     Multiple = true,
-    Options = GetBoss(),
+    Options = BossesName,
     Callback = function(Value)
         Settings['Select Boss'] = Value
     end    
-})
-
-FarmTab:AddButton({
-    Name = "Refresh Boss",
-    -- Info = "This is a Button.",
-    Callback = function()
-        if SelectBossDropdown then
-            SelectBossDropdown:Refresh(GetBoss(),true)
-        end
-    end
 })
 
 BossFarmToggle = FarmTab:AddToggle({
@@ -1802,7 +1756,6 @@ function MainFarm()
                 end
             end
         end
-        print(GetMob(BossList, true))
         TargetBoss = GetMob(BossList, true)
         if not TargetBoss
         and Settings.BFHopServer then
