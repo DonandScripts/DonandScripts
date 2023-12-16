@@ -2785,7 +2785,9 @@ function MainFarm()
         end
     end
 end
-
+local MacLevel = game:GetService("MarketplaceService"):GetProductInfo(2753915549).Description
+MacLevel = MacLevel:split("Current level cap: ")[2]:split("Current")[1]
+getgenv().MaxLevel = tonumber(MacLevel)
 spawn(function()
     while wait() do
         local a,v = pcall(function()
