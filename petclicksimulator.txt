@@ -1801,7 +1801,7 @@ function MainFarm()
                 end
             end
         end
-        TargetBoss = GetMob(BossList, true)
+        TargetBoss = GetMob(BossList)
         if not TargetBoss
         and Settings.BFHopServer then
             HopServer()
@@ -2437,7 +2437,6 @@ function MainFarm()
                                 end
                             end
                         else
-                            print('a')
                             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyBoat", "PirateBasic")
                         end
                     else
