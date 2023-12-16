@@ -830,7 +830,7 @@ function GetMob(FMob, UnloadBoss)
             end
         end
     end
-    local x = game.workspace.Enemies:GetChildren()
+    local x = game.workspace.Enemies:GetChildren() or game.ReplicatedStorage:GetChildren()
     if #x > 1 and Settings['Bring Mob'] then
         local MCounter = 0
         local MidPos
