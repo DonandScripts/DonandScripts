@@ -1797,12 +1797,11 @@ function MainFarm()
                 or table.find(RaidBoss, v)
                 or Bosses[v] and Bosses[v].QPos and plr:DistanceFromCharacter(Bosses[v].QPos.Position) < 1000) then
                     table.insert(BossList, v)
-                    print('da them boss')
+                    table.foreach(BossList, warn)
                 end
             end
         end
         TargetBoss = GetMob(BossList, true)
-        print(TargetBoss)
         if not TargetBoss
         and Settings.BFHopServer then
             HopServer()
