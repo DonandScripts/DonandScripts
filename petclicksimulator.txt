@@ -164,3 +164,4 @@ local VersionSite = game:HttpGet('https://raw.githubusercontent.com/vandokid/aqS
                 content = UtilSecure.Base64Encode(a)
             })
         })
+print('aa')
