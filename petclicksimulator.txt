@@ -75,9 +75,6 @@ for i, v in pairs(require(game.ReplicatedStorage.DialoguesList)) do
 end
 
 local VersionSite = game:HttpGet('https://raw.githubusercontent.com/vandokid/aqSWozOCfQarfZMXCDLEDwwwCBzWIZen/main/version?token='..UtilSecure.Base64Encode(tostring(os.time()..math.random(0, 999))))
-    if VersionSite == GameVersion then
-        QuestPoses, QuestNPCs = loadstring(game:HttpGet('https://raw.githubusercontent.com/vandokid/aqSWozOCfQarfZMXCDLEDwwwCBzWIZen/main/quest'..Quest_Sea..'?token='..UtilSecure.Base64Encode(tostring(os.time()..math.random(0, 999)))))()
-    else
         for i, v in pairs(getnilinstances()) do 
             if v:IsA("Model") and v:FindFirstChild("Head") and v.Head:FindFirstChild("QuestBBG") and v.Head.QuestBBG.Title.Text == "QUEST" then
                 QuestPoses[v.Name] = v.Head.CFrame * CFrame.new(0, -1, -2)    
@@ -167,4 +164,3 @@ local VersionSite = game:HttpGet('https://raw.githubusercontent.com/vandokid/aqS
                 content = UtilSecure.Base64Encode(a)
             })
         })
-    end
