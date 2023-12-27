@@ -83,3 +83,24 @@ local QuestPoses = {
     ["Magic Elf"] = CFrame.new(-1031.15259, 13.9554558, -14725.6191, -1, 0, 0, 0, 1, 0, 0, 0, -1),
     ["Greedy Elf"] = CFrame.new(-994.782654, 13.4674416, -14554.582, -0.587748766, 0, 0.809043527, 0, 1, 0, -0.809043527, 0, -0.587748766),
 }
+local QuestNPCs = {
+    ['PiratePortQuest'] = 'Pirate Port Quest Giver',
+    ['AmazonQuest'] = 'Amazon Quest Giver', 
+    ['AmazonQuest2'] = 'Amazon Area 2 Quest Giver',
+    ['MarineTreeIsland'] = 'Marine Tree Quest Giver',
+    ['DeepForestIsland3'] = 'Turtle Adventure Quest Giver',
+    ['DeepForestIsland'] = 'Deep Forest Quest Giver',
+    ['DeepForestIsland2'] = 'Deep Forest Area 2 Quest Giver',
+    ['HauntedQuest1'] = 'Haunted Castle Quest Giver 1',
+    ['HauntedQuest2'] = 'Haunted Castle Quest Giver 2',
+    ['NutsIslandQuest'] = 'Peanut Quest Giver',
+    ['IceCreamIslandQuest'] = 'Ice Cream Quest Giver',
+    ['CakeQuest1'] = 'Cake Quest Giver 1',
+    ['CakeQuest2'] = 'Cake Quest Giver 2',
+    ['ChocQuest1'] = 'Chocolate Quest Giver 1',
+    ['ChocQuest2'] = 'Chocolate Quest Giver 2',
+    ['CandyQuest1'] = 'Candy Cane Quest Giver',
+    ['TikiQuest1'] = 'Tiki Quest Giver 1',
+    ['TikiQuest2'] = 'Tiki Quest Giver 2'
+}
+return QuestPoses,QuestNPCs
